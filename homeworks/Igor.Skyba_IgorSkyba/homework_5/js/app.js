@@ -1,8 +1,9 @@
-var popupObject = {
+function PopupObject() {
+    this.popupId = 'popup';
+    this.closeId = 'close-popup';
+}
 
-    popupId: 'popup',
-    closeId: 'close-popup',
-
+PopupObject.prototype = {
     init: function (popupId, closeButton) {
 
         if (popupId) {
@@ -11,7 +12,7 @@ var popupObject = {
         if (closeButton) {
             this.closeId = closeButton;
         }
-        document.getElementById(this.closeId).onclick = popupObject.hide;
+        document.getElementById(this.closeId).onclick = this.hide;
         document.getElementById(this.popupId).onclick = function (e) {
             e.stopPropagation();
         }
@@ -25,18 +26,19 @@ var popupObject = {
     },
 
     hide: function () {
-        document.getElementById(popupObject.popupId).classList.remove("show");
+        document.getElementById(this.popupId).classList.remove("show");
     }
 
 };
 
-var content = {
+function Content() {
+    this.emptyClassName = 'empty-link';
+        this.emailId = 'email';
+        this.email = 'imskyba@gmail.com';
+        this.dateId = 'current-date'
+}
 
-    emptyClassName: 'empty-link',
-    emailId: 'email',
-    email: 'imskyba@gmail.com',
-    dateId: 'current-date',
-
+Content.prototype = {
     init: function (emptyClassName, emailId, email, dateId) {
 
         if (emptyClassName) {
@@ -59,7 +61,7 @@ var content = {
                 alert('Only the Mail and Facebook!');
             }
         }
-        document.getElementById(this.emailId).onclick = content.showEmail;
+        document.getElementById(this.emailId).onclick = this.showEmail;
 
         var today = new Date();
         var dd = today.getDate();
@@ -74,18 +76,18 @@ var content = {
             jsonObject.hide();
             popupObject.hide();
         };
-
     },
 
     showEmail: function () {
-        alert(content.email);
+        alert(this.email);
     }
 };
 
-var themeObject = {
+function ThemeObject() {
+    this.wrapper = 'theme'
+}
 
-    wrapper: 'theme',
-
+ThemeObject.prototype = {
     init: function (wrapper) {
 
         if (wrapper) {
@@ -106,21 +108,21 @@ var themeObject = {
     }
 };
 
-var jsonObject = {
+function JsonObject() {
+    this.jsonVar = {};
+}
 
-    jsonVar: {},
-
+JsonObject.prototype = {
     init: function () {
-
         var elements = document.querySelectorAll('[data-bind]');
 
         this.getJsonData('data/data.json', this.appendData);
         elements.forEach(function(item){
-            item.ondblclick = jsonObject.openInput;
+            item.ondblclick = this.openInput;
             item.onclick = function (e) {
                 e.stopPropagation();
             };
-        });
+        }.bind(this));
 
         elements = document.querySelectorAll('[data-input]');
         elements.forEach(function(item){
@@ -128,8 +130,6 @@ var jsonObject = {
                 e.stopPropagation();
             };
         })
-
-
 
     },
 
@@ -164,10 +164,10 @@ var jsonObject = {
 
         if(this.checkIfDataChange(inputValues)) {
             htmlElements.forEach(function(item){
-                if (item.innerText != jsonObject.jsonVar[item.getAttribute('data-bind')]) {
-                    item.innerText = jsonObject.jsonVar[item.getAttribute('data-bind')];
+                if (item.innerText != this.jsonVar[item.getAttribute('data-bind')]) {
+                    item.innerText = this.jsonVar[item.getAttribute('data-bind')];
                 }
-            });
+            }.bind(this));
             this.setJsonData('data/data.json')
         }
     },
@@ -191,12 +191,7 @@ var jsonObject = {
     },
 
     setJsonData: function (file) {
-        // Some code to change data in json file
-
-        // var jsonDataString = this.convertJsonText(this.jsonVar);
-        // file = new File([file], "write", "TEXT");
-        // file.write(jsonDataString);
-        // file.close();
+        // Some code to change data in json file;
     },
 
     request: function (file, callback) {
@@ -215,9 +210,9 @@ var jsonObject = {
         xobj.open('GET', file, true);
         xobj.onreadystatechange = function () {
             if (xobj.readyState == 4 && xobj.status == "200") {
-                callback(xobj.responseText);
+                callback.call(this, xobj.responseText);
             }
-        };
+        }.bind(this);
         xobj.send(null);
     },
 
@@ -238,7 +233,7 @@ var jsonObject = {
         var htmlElements = document.querySelectorAll('[data-bind]');
         var inputElements = document.querySelectorAll('[data-input]');
 
-        jsonObject.convertTextJson(text);
+        this.convertTextJson(text);
 
         htmlElements.forEach(function(item){
 
